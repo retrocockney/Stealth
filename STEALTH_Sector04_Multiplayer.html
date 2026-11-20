@@ -39,9 +39,9 @@ html,body{margin:0;height:100%;overflow:hidden;background:#0b0f0c;font-family:'C
 </div>
 <div class="onlineConfig">
 <label>CALLSIGN <input id="playerName" maxlength="16" value="RANGER" autocomplete="off"></label>
-<label>RENDER SERVER <input id="serverUrl" placeholder="wss://your-service.onrender.com/ws" autocomplete="off"></label>
+
 </div>
-<div id="menuStatus">Bots is offline. FFA and 1v1 need your Render server URL.</div>
+<div id="menuStatus">Bots is offline. FFA and 1v1 connect automatically.</div>
 <button id="cancelQueue" type="button" style="display:none">CANCEL SEARCH</button>
 <div class="controlsText">WASD move · Shift sprint · C / Ctrl crouch · Z lie flat · Space jump / climb · B binoculars · V camouflage · T recentres view<br>Online: shoot other players to score kills. First to 10 kills wins. Left click fire · 1 pistol · 3 sniper · R reload.<br>Click a mode to begin</div>
 </div>
@@ -377,10 +377,8 @@ function connectOnline(mode){
  if(netSocket){try{netSocket.close();}catch(e){}netSocket=null;}
  for(const id of [...remotePlayers.keys()])removeRemotePlayer(id);
  gameMode=mode;playerCallsign=cleanCallsign(document.getElementById('playerName').value);
- const url=document.getElementById('serverUrl').value.trim();
- if(!url){setMenuStatus('Paste your Render WebSocket URL first (it ends with /ws).');return;}
- if(!/^wss?:\/\//i.test(url)){setMenuStatus('Server address must start with wss://');return;}
- try{localStorage.setItem('stealthServerUrl',url);localStorage.setItem('stealthPlayerName',playerCallsign);}catch(e){}
+ const url='wss://stealth-sector04-multiplayer.onrender.com/ws';
+ try{localStorage.setItem('stealthPlayerName',playerCallsign);}catch(e){}
  setMenuStatus(mode==='duel'?'Connecting and searching for a 1v1 opponent…':'Connecting to FFA…');
  document.getElementById('cancelQueue').style.display='inline-block';
  const socket=new WebSocket(url);netSocket=socket;
@@ -780,7 +778,7 @@ document.getElementById('modeBots').addEventListener('click',startBotsMode);
 document.getElementById('modeFfa').addEventListener('click',()=>connectOnline('ffa'));
 document.getElementById('modeDuel').addEventListener('click',()=>connectOnline('duel'));
 document.getElementById('cancelQueue').addEventListener('click',cancelOnlineQueue);
-try{const savedUrl=localStorage.getItem('stealthServerUrl');const savedName=localStorage.getItem('stealthPlayerName');if(savedUrl)document.getElementById('serverUrl').value=savedUrl;if(savedName)document.getElementById('playerName').value=savedName;}catch(e){}
+try{const savedName=localStorage.getItem('stealthPlayerName');if(savedName)document.getElementById('playerName').value=savedName;}catch(e){}
 
 
 reset();setCamo('green');camPos.copy(pl.position).add(new THREE.Vector3(0,2,3));camLook.copy(pl.position);
