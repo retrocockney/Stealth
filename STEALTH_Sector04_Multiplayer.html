@@ -13,48 +13,12 @@ html,body{margin:0;height:100%;overflow:hidden;background:#0b0f0c;font-family:'C
 #hud{position:fixed;left:16px;bottom:16px;width:260px;pointer-events:none;font-size:12px}
 .bar{height:8px;background:rgba(255,255,255,.12);margin:4px 0 10px}
 .bar>i{display:block;height:100%;width:0;background:#8fb36b}
-
-#start{padding:24px;box-sizing:border-box;overflow:auto}
-.modeTitle{margin-top:18px;letter-spacing:3px;color:#9fb28a;font-size:12px}
-.modeButtons{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:12px 0}
-.modeButtons button,#cancelQueue{background:#182319;color:#d2dfc5;border:1px solid #71845e;padding:11px 18px;font:inherit;letter-spacing:1px;cursor:pointer}
-.modeButtons button:hover,#cancelQueue:hover{background:#2b3d29;border-color:#afc78f}
-.onlineConfig{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:10px 0}
-.onlineConfig label{display:flex;flex-direction:column;gap:4px;text-align:left;font-size:10px;letter-spacing:1px;color:#91a184}
-.onlineConfig input{width:250px;max-width:70vw;background:#090e0a;border:1px solid #56664a;color:#d7e4c5;padding:8px;font:12px 'Courier New',monospace}
-#menuStatus{max-width:650px;min-height:22px;color:#e0c97a;font-size:12px;margin:8px auto}
-.controlsText{font-size:11px;line-height:1.7;opacity:.78;margin-top:14px}
-#onlineBoard{display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:20;min-width:280px;max-width:min(520px,90vw);padding:18px 20px;background:rgba(5,10,7,.94);border:1px solid rgba(151,175,127,.75);box-shadow:0 12px 50px #000b;font-size:13px;line-height:1.8;pointer-events:none}
-#onlineBoard .boardTitle{color:#d8e8c7;letter-spacing:2px;margin-bottom:10px;font-size:15px;text-align:center}
-#onlineBoard .boardHint{color:#91a184;text-align:center;font-size:10px;letter-spacing:1px;margin-top:10px}
-#onlineBoard .boardRow{padding:5px 2px;border-bottom:1px solid rgba(151,175,127,.18)}
-#onlineBoard .boardRow:first-child{color:#e8d58a}
-#onlineBoard .boardRow{display:flex;justify-content:space-between;gap:12px}
 </style></head><body>
-<div id="start">
-<h1>STEALTH</h1>
-<div>Sector 04 — The Whispering Canopy</div>
-<div class="modeTitle">SELECT GAME MODE</div>
-<div class="modeButtons">
-<button id="modeBots" type="button">BOTS</button>
-<button id="modeFfa" type="button">FREE-FOR-ALL</button>
-<button id="modeDuel" type="button">1 VS 1</button>
-</div>
-<div class="onlineConfig">
-<label>CALLSIGN <input id="playerName" maxlength="16" value="RANGER" autocomplete="off"></label>
-
-</div>
-<div id="menuStatus">Bots is offline. FFA and 1v1 connect automatically to the online server.</div>
-<button id="cancelQueue" type="button" style="display:none">CANCEL SEARCH</button>
-<div class="controlsText">WASD move · Shift sprint · C / Ctrl crouch · Z lie flat · Space jump / climb · B binoculars · V camouflage · T recentres view<br>Online: shoot other players to score kills. First to 10 kills wins. Left click fire · 1 pistol · 3 sniper · R reload.<br>Click a mode to begin</div>
-</div>
+<div id="start"><h1>STEALTH</h1><div>Sector 04 — The Whispering Canopy</div>
+<div style="margin-top:16px">WASD move · Shift sprint · C / Ctrl crouch toggle (moving while crouched = crawl on knees) · Z lie flat<br>Space jump / climb ledges while facing them · B binoculars (spawn equipped) · 1 pistol · 2 knife · E pick up items · I inventory · V camouflage · T recentres view · Hold Q / G to lean left / right · Right mouse toggles first person · LMB fire · R reload · F knife<br>Guards shoot you whenever they have you in sight within range.<br>Click to begin</div></div>
 <div id="msg"></div><div id="shot" style="position:fixed;top:44px;left:16px;font-size:12px;color:#e0c97a;letter-spacing:1px;pointer-events:none"></div><div id="prompt">[F] TAKEDOWN</div><div id="inv" style="display:none;position:fixed;inset:0;background:rgba(4,8,6,.82);z-index:6;align-items:center;justify-content:center;font-size:14px;line-height:1.8"><div style="border:1px solid #6b7d5c;padding:24px 32px;min-width:320px;background:#0d130f"><div style="letter-spacing:4px;color:#b9cfa3;margin-bottom:12px">INVENTORY</div><div id="invlist"></div><div style="margin-top:14px;font-size:11px;opacity:.7">I to close · click USE to use an item</div></div></div><div id="scope" style="display:none;position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 50%,transparent 26vmin,#000 27vmin)"></div><div id="cross"></div><div id="binocOverlay"><div id="binocLabel">BINOCULARS · B TO LOWER</div></div>
-<div id="onlineBoard"><div class="boardTitle">MATCH PLAYERS</div><div id="onlineRows"></div><div class="boardHint">RELEASE TAB TO CLOSE</div></div>
 <div id="hud"><div>HEALTH</div><div class="bar"><i id="hp" style="background:#c8643c"></i></div><div>STAMINA</div><div class="bar"><i id="stam"></i></div><div id="status"></div><div id="kills" style="margin-top:6px"></div></div>
 <script>
-// Shared world seed: keeps procedural scenery aligned on every multiplayer client.
-let _worldSeed=6042026;
-Math.random=()=>{_worldSeed=(_worldSeed*1664525+1013904223)>>>0;return _worldSeed/4294967296;};
 const CAMO={green:{name:'WOODLAND GREEN',zone:'green',c:['#3f5a2a','#2a3d1c','#6b7a45','#1c2a14']},
 bark:{name:'BARK BROWN',zone:'bark',c:['#5a4632','#3b2c1d','#7a6248','#2e2317']},
 slate:{name:'SLATE GREY',zone:'slate',c:['#5b6168','#3d4248','#7a8089','#2c3035']}};
@@ -216,14 +180,6 @@ for(let i=0,n=0;n<16&&i<400;i++){const x=(Math.random()-.5)*150,z=(Math.random()
 const RC=new THREE.Raycaster();
 let sniperOwned=false,scopeLevel=0,shotDamage=25,binoculars=false,noiseT=0,slideT=0,slideDX=0,slideDZ=0,healthPacks=0,hasKnife=false,curWeapon='gun',recoil=0,breathT=0,lastStepIdx=0,mag=12,reserve=0,partials=[],reloadT=0,fireCd=0,knifeT=0,yaw=0,pitch=0,lean=0,crouch=0,stam=100,hp=100,hurtT=0,deadT=0,camo='green',started=false,aim=false,crouchToggle=false,prone=false,proneT=0,sprintingNow=false,lastZone='green',lastMatch=true,kills=0,ph=0,animAmp=0,kneeT=0,jumpVel=0;
 const keys={};const camPos=new THREE.Vector3(),camLook=new THREE.Vector3();
-let gameMode='bots',onlineActive=false,onlineFinished=false,scoreboardHeld=false,netSocket=null,netId=null,netRoom=null,netSlot=0,netTick=0,onlineScore=0,onlineDeaths=0,playerCallsign='RANGER';
-const remotePlayers=new Map();
-const ONLINE_SPAWNS=[[-34,0],[34,0],[0,-34],[0,34],[-28,-28],[28,28],[-28,28],[28,-28]];
-const DUEL_SPAWNS=[[-14,0],[14,0]];
-function netSend(data){if(netSocket&&netSocket.readyState===WebSocket.OPEN)netSocket.send(JSON.stringify(data));}
-function setMenuStatus(t){const el=document.getElementById('menuStatus');if(el)el.textContent=t;}
-function cleanCallsign(v){return String(v||'RANGER').replace(/[^a-zA-Z0-9 _-]/g,'').trim().slice(0,16)||'RANGER';}
-
 const setCamo=k=>{camo=k;camoMat.map=TEX[k];camoMat.needsUpdate=true;};
 function nearTree(x,z){for(const t of trees)if((t.x-x)**2+(t.z-z)**2<9)return true;return false;}
 const climb={on:false,t:0,x0:0,y0:0,z0:0,x1:0,y1:0,z1:0};
@@ -307,151 +263,10 @@ function spawnPoint(){const saved=pl.position.clone();
   let ok=true;for(const g of guards){if(g.dead)continue;if(Math.hypot(x-g.g.position.x,z-g.g.position.z)<14||canSee(g,40)){ok=false;break;}}
   if(ok){pl.position.copy(saved);return{x,z};}}
  pl.position.copy(saved);return{x:0,z:10};}
-function reset(){if(onlineActive)_worldSeed=6042026;yaw=0;pitch=0;jumpVel=0;stam=100;hp=100;hurtT=0;deadT=0;prone=false;kills=0;mag=12;reserve=0;partials=[];reloadT=0;fireCd=0;knifeT=0;
+function reset(){yaw=0;pitch=0;jumpVel=0;stam=100;hp=100;hurtT=0;deadT=0;prone=false;kills=0;mag=12;reserve=0;partials=[];reloadT=0;fireCd=0;knifeT=0;
  guards.forEach((g,i)=>{g.hp=60;g.dead=false;g.i=0;g.spd=0;g.cd=0;g.g.rotation.z=0;g.g.position.set(GR[i].x,hf(GR[i].x,GR[i].z),GR[i].z);});
  hasKnife=false;curWeapon='gun';healthPacks=0;sniperOwned=false;scopeLevel=0;shotDamage=25;binoculars=false;noiseT=0;ammoStore.gun={mag:12,reserve:0,partials:[]};ammoStore.sniper={mag:5,reserve:0,partials:[]};placeKnives(3);placeHealth(3);placeAmmo(6);placeSniper(1);
  const sp=spawnPoint();pl.position.set(sp.x,hf(sp.x,sp.z),sp.z);}
-function remoteColor(slot){const colors=[0x8fa9c7,0xc5a16d,0x9cbd84,0xb59bc9,0x83b9b5,0xc18f8f,0xb0b88a,0x9b9b9b];return colors[slot%colors.length];}
-function addRemotePlayer(p){
- if(!p||!p.id||p.id===netId)return;
- let r=remotePlayers.get(p.id);
- if(!r){const mat=new THREE.MeshStandardMaterial({color:remoteColor(p.slot||0),roughness:.9});const rig=buildHuman(mat,darkM);const g=new THREE.Group();g.add(rig.body);S.add(g);r={g,rig,ph:0,amp:0,target:{x:0,y:0,z:0,yaw:0,crouch:0,prone:false,moving:false,dead:false}};remotePlayers.set(p.id,r);}
- if(p.state)r.target={...r.target,...p.state};
- r.score=p.score??r.score??0;r.deaths=p.deaths??r.deaths??0;r.name=p.name||r.name||'PLAYER';r.slot=p.slot??r.slot??0;
-}
-function removeRemotePlayer(id){const r=remotePlayers.get(id);if(!r)return;S.remove(r.g);remotePlayers.delete(id);}
-function applyRemoteState(msg){let r=remotePlayers.get(msg.id);if(!r){addRemotePlayer({id:msg.id,state:msg.state,name:msg.name,slot:msg.slot,score:msg.score,deaths:msg.deaths});r=remotePlayers.get(msg.id);}if(!r)return;r.target={...r.target,...msg.state};if(msg.score!==undefined)r.score=msg.score;if(msg.deaths!==undefined)r.deaths=msg.deaths;if(scoreboardHeld)renderOnlineBoard(latestOnlineRoster);}
-function updateRemotePlayers(dt){
- for(const r of remotePlayers.values()){
-  const t=r.target;r.g.position.x+=(t.x-r.g.position.x)*Math.min(1,dt*14);r.g.position.y+=(t.y-r.g.position.y)*Math.min(1,dt*14);r.g.position.z+=(t.z-r.g.position.z)*Math.min(1,dt*14);
-  let dy=((t.yaw-r.g.rotation.y+Math.PI*3)%(Math.PI*2))-Math.PI;r.g.rotation.y+=dy*Math.min(1,dt*12);
-  const move=t.moving?1:0;r.amp+=(move-r.amp)*Math.min(1,dt*8);if(move)r.ph+=dt*5;
-  pose(r.rig,r.ph,r.amp,t.crouch||0,t.prone?1:0);
-  r.rig.body.rotation.x=t.prone?Math.PI/2:0;
-  r.g.rotation.z=t.dead?Math.PI/2:0;
- }
-}
-function renderOnlineBoard(rows){
- const board=document.getElementById('onlineBoard'),host=document.getElementById('onlineRows');if(!host)return;
- board.style.display=(onlineActive&&scoreboardHeld)?'block':'none';
- if(Array.isArray(rows)&&rows.length)latestOnlineRoster=rows.map(p=>({...p}));
- const roster=new Map();
- for(const p of latestOnlineRoster)if(p&&p.id)roster.set(p.id,{...p});
- for(const [id,r] of remotePlayers)roster.set(id,{...(roster.get(id)||{}),id,name:r.name||'PLAYER',score:r.score||0,deaths:r.deaths||0,slot:r.slot||0});
- if(netId)roster.set(netId,{...(roster.get(netId)||{}),id:netId,name:playerCallsign,score:onlineScore,deaths:onlineDeaths});
- const sorted=[...roster.values()].sort((a,b)=>(b.score||0)-(a.score||0));host.innerHTML='';
- for(const p of sorted){const row=document.createElement('div');row.className='boardRow';const n=document.createElement('span');n.textContent=(p.id===netId?'▶ ':'')+(p.name||'PLAYER');const sc=document.createElement('b');sc.textContent=(p.score||0)+' K / '+(p.deaths||0)+' D';row.append(n,sc);host.appendChild(row);}
-}
-function onlineSpawn(slot){
- const list=gameMode==='duel'?DUEL_SPAWNS:ONLINE_SPAWNS;const q=list[((Number(slot)||0)%list.length+list.length)%list.length];
- let x=q[0],z=q[1],found=false;
- for(let ring=0;ring<=12&&!found;ring++){
-  const count=ring===0?1:16;
-  for(let k=0;k<count;k++){
-   const a=k*Math.PI*2/count,tx=q[0]+Math.cos(a)*ring*2.5,tz=q[1]+Math.sin(a)*ring*2.5;
-   if(clearAt(tx,tz)){x=tx;z=tz;found=true;break;}
-  }
- }
- pl.position.set(x,hf(x,z),z);yaw=Math.atan2(-x,-z);pitch=0;camPos.set(x,hf(x,z)+2,z+3);camLook.set(x,hf(x,z)+1,z);
-}
-function hideOnlinePickups(){
- for(const arr of [knifePickups,healthPickups,sniperPickups,ammoPickups])for(const k of arr)if(k.g)k.g.visible=false;
- for(const g of guards)g.g.visible=false;
-}
-function startOnlineMatch(msg){
- netId=msg.id;netRoom=msg.room;netSlot=Number(msg.slot??(msg.players||[]).find(p=>p.id===msg.id)?.slot??0);latestOnlineRoster=(msg.players||[]).map(p=>({...p}));onlineActive=true;onlineFinished=false;gameMode=msg.mode||gameMode;onlineScore=0;onlineDeaths=0;
- reset();hideOnlinePickups();
- // Online matches start with a standard pistol + sniper loadout.
- sniperOwned=true;curWeapon='gun';ammoStore.gun={mag:12,reserve:48,partials:[]};ammoStore.sniper={mag:5,reserve:20,partials:[]};mag=12;reserve=48;partials=[];shotDamage=25;
- onlineSpawn(netSlot);
- for(const p of (msg.players||[]))addRemotePlayer(p);
- document.getElementById('start').style.display='none';document.getElementById('onlineBoard').style.display='block';document.getElementById('cancelQueue').style.display='none';
- started=true;initAudio();renderOnlineBoard(msg.players||[]);setMenuStatus('');
- if(R.domElement.requestPointerLock)R.domElement.requestPointerLock();
- document.getElementById('shot').textContent=gameMode==='duel'?'1 VS 1 — FIRST TO 10 KILLS':'FREE-FOR-ALL — FIRST TO 10 KILLS';hud();
-}
-function onNetMessage(m){
- if(!m||typeof m!=='object')return;
- if(m.type==='waiting'){setMenuStatus('Searching for an opponent… keep this page open.');return;}
- if(m.type==='error'){setMenuStatus(m.message||'Online connection error.');return;}
- if(m.type==='joined'||m.type==='matchFound'){startOnlineMatch(m);return;}
- if(m.type==='playerJoined'){addRemotePlayer(m.player);if(Array.isArray(m.players)&&m.players.length)latestOnlineRoster=m.players.map(p=>({...p}));renderOnlineBoard(m.players||[]);return;}
- if(m.type==='state'){applyRemoteState(m);return;}
- if(m.type==='playerLeft'){removeRemotePlayer(m.id);latestOnlineRoster=latestOnlineRoster.filter(p=>p.id!==m.id);if(Array.isArray(m.players)&&m.players.length)latestOnlineRoster=m.players.map(p=>({...p}));renderOnlineBoard(m.players||[]);if(gameMode==='duel')document.getElementById('shot').textContent='OPPONENT LEFT THE MATCH';return;}
- if(m.type==='scoreboard'){onlineScore=m.selfScore??onlineScore;onlineDeaths=m.selfDeaths??onlineDeaths;renderOnlineBoard(m.players||[]);hud();return;}
- if(m.type==='ammo'){
-  for(const w of ['gun','sniper'])if(m.ammo&&m.ammo[w])ammoStore[w]={...ammoStore[w],...m.ammo[w]};
-  if(m.ammo&&m.ammo[curWeapon]){mag=m.ammo[curWeapon].mag;reserve=m.ammo[curWeapon].reserve;}
-  hud();return;
- }
- if(m.type==='reloading'){document.getElementById('shot').textContent='RELOADING';return;}
- if(m.type==='empty'){document.getElementById('shot').textContent='EMPTY — PRESS R';return;}
- if(m.type==='respawnWait'){deadT=Math.max(.1,(m.milliseconds||250)/1000);return;}
- if(m.type==='shotResult'){document.getElementById('shot').textContent=m.hit?(m.part==='head'?'HEADSHOT':'HIT'):'MISS';return;}
- if(m.type==='damage'){hp=Math.max(0,m.hp||0);hurtT=1.0;document.getElementById('shot').textContent='UNDER FIRE';hud();return;}
- if(m.type==='kill'){onlineScore=m.kills||onlineScore;document.getElementById('shot').textContent='ELIMINATED '+(m.target||'PLAYER')+' · +1 KILL';hud();return;}
- if(m.type==='death'){hp=0;deadT=2.5;onlineDeaths=m.deaths||onlineDeaths;document.getElementById('shot').textContent='ELIMINATED BY '+(m.by||'PLAYER')+' — RESPAWNING';hud();return;}
- if(m.type==='respawned'){deadT=0;hp=100;hurtT=0;prone=false;crouchToggle=false;proneT=0;kneeT=0;binoculars=false;aim=false;onlineSpawn(netSlot);document.getElementById('shot').textContent='BACK IN THE FIELD';hud();return;}
- if(m.type==='matchWon'){onlineFinished=true;document.getElementById('shot').textContent=(m.name||'PLAYER')+' WINS — 10 KILLS';return;}
-}
-function connectOnline(mode){
- if(netSocket){try{netSocket.close();}catch(e){}netSocket=null;}
- for(const id of [...remotePlayers.keys()])removeRemotePlayer(id);latestOnlineRoster=[];
- gameMode=mode;playerCallsign=cleanCallsign(document.getElementById('playerName').value);
- const url='wss://stealth-sector04-multiplayer.onrender.com/ws';
- try{localStorage.setItem('stealthPlayerName',playerCallsign);}catch(e){}
- setMenuStatus(mode==='duel'?'Connecting and searching for a 1v1 opponent…':'Connecting to FFA…');
- document.getElementById('cancelQueue').style.display='inline-block';
- const socket=new WebSocket(url);netSocket=socket;
- socket.addEventListener('open',()=>{netSend({type:'join',mode,name:playerCallsign});});
- socket.addEventListener('message',e=>{try{onNetMessage(JSON.parse(e.data));}catch(err){setMenuStatus('Received an unreadable server message.');}});
- socket.addEventListener('error',()=>{setMenuStatus('Could not connect. Check the Render URL and make sure the service is live.');});
- socket.addEventListener('close',()=>{if(!onlineActive)setMenuStatus('Connection closed. Check that the Render server is running.');else document.getElementById('shot').textContent='CONNECTION LOST — RETURN TO MENU TO RECONNECT';onlineActive=false;});
-}
-function cancelOnlineQueue(){if(netSocket){try{netSocket.close();}catch(e){}netSocket=null;}document.getElementById('cancelQueue').style.display='none';setMenuStatus('Search cancelled.');}
-function fireOnline(){
- const sh=document.getElementById('shot');
- if(!onlineActive||onlineFinished||deadT!==0)return;
- if(curWeapon!=='gun'&&curWeapon!=='sniper')return;
- if(curWeapon==='sniper'&&!aim){sh.textContent='SCOPE IN (RIGHT CLICK)';return;}
- if(reloadT>0){sh.textContent='RELOADING';return;}
- if(fireCd>0)return;
- if(mag<=0){sh.textContent='EMPTY — PRESS R';return;}
- mag--;ammoStore[curWeapon]={mag,reserve,partials};
- fireCd=curWeapon==='sniper'?1.0:.3;sfx.shot();recoil=1;
- const origin=cam.position.clone(),dir=new THREE.Vector3();cam.getWorldDirection(dir);
- const maxRange=curWeapon==='sniper'?100:45;
- let best=null;S.updateMatrixWorld(true);RC.set(origin,dir);RC.far=maxRange;
- for(const [id,r] of remotePlayers){
-  const hits=RC.intersectObject(r.g,true);
-  if(hits.length&&(!best||hits[0].distance<best.distance))best={id,r,hit:hits[0],distance:hits[0].distance};
- }
- const walls=RC.intersectObjects(obs,false);RC.far=Infinity;
- if(best&&walls.length&&walls[0].distance<best.distance)best=null;
- netSend({type:'shot',weapon:curWeapon,target:best?best.id:null,origin:{x:origin.x,y:origin.y,z:origin.z},dir:{x:dir.x,y:dir.y,z:dir.z}});
- sh.textContent='SHOT';hud();
-}
-function fire(){
- if(onlineActive){fireOnline();return;}
- const sh=document.getElementById('shot');
- if(deadT>0||!started)return;
- if(curWeapon!=='gun'&&curWeapon!=='sniper'){sh.textContent='GUN NOT EQUIPPED';return;}
- if(curWeapon==='sniper'&&!aim){sh.textContent='SCOPE IN (RIGHT CLICK)';return;}
- if(reloadT>0){sh.textContent='RELOADING';return;}
- if(fireCd>0)return;
- if(mag<=0){sh.textContent='EMPTY — PRESS R';return;}
- mag--;fireCd=curWeapon==='sniper'?1.0:.3;sfx.shot();recoil=1;noiseT=6;
- const dir=new THREE.Vector3();cam.getWorldDirection(dir);
- const origin=(aim&&curWeapon==='sniper')?cam.position.clone().addScaledVector(dir,.5):gunGrp.visible?gunGrp.localToWorld(new THREE.Vector3(0,0,-.3)):tpGun.localToWorld(new THREE.Vector3(0,0,.3));
- const m=new THREE.Mesh(bulletG,bulletM);m.position.copy(origin);
- m.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,-1),dir);S.add(m);
- bullets.push({m,dir:dir.clone().multiplyScalar(curWeapon==='sniper'?3.2:BULLET_STEP),dist:0});}
-function respawnOnline(){netSend({type:'respawn'});deadT=-1;}
-function sendOnlineState(dt){
- if(!onlineActive||onlineFinished)return;netTick+=dt;if(netTick<.075)return;netTick=0;
- netSend({type:'state',state:{x:pl.position.x,y:pl.position.y,z:pl.position.z,yaw,pitch,crouch,prone,moving:!!(keys.KeyW||keys.KeyA||keys.KeyS||keys.KeyD)}});
-}
-
 function takedown(){
  const p=pl.position;let best=null,bd=2.2;
  for(const g of guards){if(g.dead)continue;const d=Math.hypot(p.x-g.g.position.x,p.z-g.g.position.z);if(d<bd){bd=d;best=g;}}
@@ -462,7 +277,7 @@ function hud(){
  const alive=guards.filter(g=>!g.dead).length;
  const st=document.getElementById('status');
  st.textContent=(binoculars?'BINOCULARS ACTIVE · ':'')+(deadT>0?'KILLED — RESPAWNING':hp<=0?'KILLED':hurtT>0?'UNDER FIRE':'CLEAR')+(prone?' · PRONE':'')+' · VIEW: '+(aim?'FIRST PERSON':'THIRD PERSON');
- document.getElementById('kills').textContent=onlineActive?('KILLS: '+onlineScore+' / 10 · DEATHS: '+onlineDeaths+' · '+curWeapon.toUpperCase()+' AMMO: '+mag+'/'+reserve+(reloadT>0?' · RELOADING':'')):('GUARDS: '+alive+'/'+guards.length+' · KILLS: '+kills+' · PACKS '+healthPacks+' (I)'+(curWeapon==='knife'?' · KNIFE':' · AMMO '+mag+'/'+reserve+(reloadT>0?' · RELOADING':'')));
+ document.getElementById('kills').textContent='GUARDS: '+alive+'/'+guards.length+' · KILLS: '+kills+' · PACKS '+healthPacks+' (I)'+(curWeapon==='knife'?' · KNIFE':' · AMMO '+mag+'/'+reserve+(reloadT>0?' · RELOADING':''));
  document.getElementById('msg').textContent='CAMO: '+CAMO[camo].name+' · ZONE: '+lastZone.toUpperCase()+' ('+(lastMatch?'MATCH':'MISMATCH')+')';}
 
 // ---- Weapons: suppressed pistol (first person viewmodel) and tactical knife ----
@@ -499,16 +314,14 @@ function weaponsUpdate(dt){
  recoil=Math.max(0,recoil-dt*6);gunGrp.rotation.x=-.12*recoil;
  if(reloadT>0){reloadT-=dt;if(reloadT<=0){
   const capacity=curWeapon==='sniper'?5:12;
-  if(reserve>0){const loaded=Math.min(capacity-mag,reserve);mag+=loaded;reserve-=loaded;}
-  ammoStore[curWeapon]={mag,reserve,partials};
- }}
+  if(reserve>0){const loaded=Math.min(capacity-mag,reserve);mag+=loaded;reserve-=loaded;}}}
  fireCd-=dt;
  magFP.position.y=-.13-(reloadT>0?Math.sin(Math.PI*(1-reloadT/1.0))*.25:0);
  magFP.visible=curWeapon==='gun';
  if(knifeT>0)knifeT-=dt;
- gunGrp.visible=curWeapon==='gun'&&knifeT<=0&&!binoculars;
- knifeGrp.visible=curWeapon==='knife'&&!binoculars; // First-person knife must never appear in third-person view.
- tpGun.visible=(curWeapon==='gun'||curWeapon==='sniper')&&!binoculars;tpKnife.visible=curWeapon==='knife'&&!binoculars;
+ gunGrp.visible=aim&&knifeT<=0&&curWeapon==='gun';
+ knifeGrp.visible=aim&&(knifeT>0||curWeapon==='knife'); // First-person knife must never appear in third-person view.
+ tpGun.visible=curWeapon==='gun'||curWeapon==='sniper';tpKnife.visible=curWeapon==='knife';
  knifeGrp.position.z=-.35-(knifeT>0?Math.sin(Math.PI*(1-knifeT/.4))*.12:0);}
 // ---- Sound: all effects are synthesised with Web Audio, so there are no sound files ----
 let AC=null,NB=null;
@@ -574,6 +387,20 @@ function nearSniper(){if(sniperOwned)return null;let best=null,bd=2.2;
  for(const k of sniperPickups){const d=Math.hypot(pl.position.x-k.x,pl.position.z-k.z);if(d<bd){bd=d;best=k;}}return best;}
 function pickSniper(){const k=nearSniper();if(!k)return;S.remove(k.g);sniperPickups.splice(sniperPickups.indexOf(k),1);
  sniperOwned=true;document.getElementById('shot').textContent='SNIPER PICKED UP — PRESS 3';}
+function fire(){
+ const sh=document.getElementById('shot');
+ if(deadT>0||!started)return;
+ if(curWeapon!=='gun'&&curWeapon!=='sniper'){sh.textContent='GUN NOT EQUIPPED';return;}
+ if(curWeapon==='sniper'&&!aim){sh.textContent='SCOPE IN (RIGHT CLICK)';return;}
+ if(reloadT>0){sh.textContent='RELOADING';return;}
+ if(fireCd>0)return;
+ if(mag<=0){sh.textContent='EMPTY — PRESS R';return;}
+ mag--;fireCd=curWeapon==='sniper'?1.0:.3;sfx.shot();recoil=1;noiseT=6;
+ const dir=new THREE.Vector3();cam.getWorldDirection(dir);
+ const origin=(aim&&curWeapon==='sniper')?cam.position.clone().addScaledVector(dir,.5):gunGrp.visible?gunGrp.localToWorld(new THREE.Vector3(0,0,-.3)):tpGun.localToWorld(new THREE.Vector3(0,0,.3));
+ const m=new THREE.Mesh(bulletG,bulletM);m.position.copy(origin);
+ m.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,-1),dir);S.add(m);
+ bullets.push({m,dir:dir.clone().multiplyScalar(curWeapon==='sniper'?3.2:BULLET_STEP),dist:0});}
 function bulletsUpdate(dt){
  const sh=document.getElementById('shot');
  for(let i=bullets.length-1;i>=0;i--){
@@ -595,7 +422,7 @@ function bulletsUpdate(dt){
    removeBullet(i);continue;}
   if(b.dist>=BULLET_RANGE){sh.textContent='MISS';removeBullet(i);}
  }}
-function knife(){if(onlineActive)return;if(deadT>0)return;
+function knife(){const sh=document.getElementById('shot');if(deadT>0)return;
  if(!hasKnife||curWeapon!=='knife'){sh.textContent=hasKnife?'EQUIP KNIFE (2)':'NO KNIFE — FIND ONE';return;}
  knifeT=.4;sfx.knife();takedown();}
 // Knife pickups lie on the ground; press E near one to pick it up.
@@ -689,9 +516,7 @@ function update(dt){
  const leanTarget=(keys.KeyG?1:0)-(keys.KeyQ?1:0);
  lean+=(leanTarget-lean)*Math.min(1,dt*9);
  pvel.subVectors(p,prevP).multiplyScalar(1/Math.max(dt,1e-3));prevP.copy(p);
- if(deadT>0){deadT-=dt;if(deadT<=0){if(onlineActive)respawnOnline();else reset();}hud();return;}
- if(deadT<0){hud();return;}
- if(onlineActive&&onlineFinished){hud();return;}
+ if(deadT>0){deadT-=dt;if(deadT<=0)reset();hud();return;}
  weaponsUpdate(dt);
  bulletsUpdate(dt);
  let mx=(keys.KeyD?1:0)-(keys.KeyA?1:0),mz=(keys.KeyW?1:0)-(keys.KeyS?1:0);
@@ -765,43 +590,35 @@ pRig.body.position.y=hipH-.45*cw-.55*kneeT*(1-proneT);
  lastZone=inBunker(p.x,p.z)?'slate':nearTree(p.x,p.z)?'bark':'green';
  lastMatch=CAMO[camo].zone===lastZone;
 
- if(hurtT>0)hurtT-=dt;else if(!onlineActive)hp=Math.min(100,hp+10*dt);
+ if(hurtT>0)hurtT-=dt;else hp=Math.min(100,hp+10*dt);
  noiseT=Math.max(0,noiseT-dt);
- if(!onlineActive)for(const g of guards)updateGuard(g,dt);else{updateRemotePlayers(dt);sendOnlineState(dt);}
+ for(const g of guards)updateGuard(g,dt);
  let near=false;for(const g of guards){if(!g.dead&&Math.hypot(p.x-g.g.position.x,p.z-g.g.position.z)<2.2)near=true;}
- const pk=onlineActive?false:nearKnife(),nh=onlineActive?false:nearHealth(),ns=onlineActive?false:nearSniper(),na=onlineActive?false:nearAmmo();const pr=document.getElementById('prompt');pr.textContent=onlineActive?'':(pk?'[E] PICK UP KNIFE':nh?'[E] PICK UP HEALTH PACK':ns?'[E] PICK UP SNIPER':na?'[E] PICK UP AMMO':'');pr.style.display=(!onlineActive&&(pk||nh||ns||na))?'block':'none';
+ const pk=nearKnife(),nh=nearHealth(),ns=nearSniper(),na=nearAmmo();const pr=document.getElementById('prompt');pr.textContent=pk?'[E] PICK UP KNIFE':nh?'[E] PICK UP HEALTH PACK':ns?'[E] PICK UP SNIPER':na?'[E] PICK UP AMMO':'';pr.style.display=(pk||nh||ns||na)?'block':'none';
  if(hp<=0){deadT=2.5;hud();return;}
  hud();
 }
 
-addEventListener('keydown',e=>{if(e.code==='Tab'&&onlineActive){e.preventDefault();scoreboardHeld=true;renderOnlineBoard(latestOnlineRoster);return;}if(!started)return;if(e.code==='Space')e.preventDefault();if(e.repeat&&e.code==='Space')return;keys[e.code]=true;
+addEventListener('keydown',e=>{if(!started)return;if(e.code==='Space')e.preventDefault();if(e.repeat&&e.code==='Space')return;keys[e.code]=true;
  if(e.code==='KeyT'){yaw=0;pitch=0;}
  if(e.code==='KeyB'){binoculars=!binoculars;aim=binoculars;scopeLevel=0;document.getElementById('shot').textContent=binoculars?'BINOCULARS UP':'BINOCULARS LOWERED';}
  if(e.code==='KeyC'||e.code==='ControlLeft'){if(!crouchToggle&&sprintingNow&&slideT<=0){slideT=.8;slideDX=Math.sin(yaw);slideDZ=Math.cos(yaw);crouchToggle=true;}else crouchToggle=!crouchToggle;}
  if(e.code==='KeyZ'){prone=!prone;if(prone)aim=false;}
- if(e.code==='KeyF'){if(!onlineActive)knife();}
- if(e.code==='KeyE'&&!onlineActive){if(nearAmmo())pickAmmo();else if(nearHealth())pickHealth();else if(nearSniper())pickSniper();else pickKnife();}
+ if(e.code==='KeyF')knife();
+ if(e.code==='KeyE'){if(nearAmmo())pickAmmo();else if(nearHealth())pickHealth();else if(nearSniper())pickSniper();else pickKnife();}
  if(e.code==='KeyI')toggleInv();
- if(e.code==='KeyR'&&(curWeapon==='gun'||curWeapon==='sniper')&&reloadT<=0&&mag<(curWeapon==='sniper'?5:12)&&reserve>0){reloadT=1.0;sfx.reload();if(onlineActive)netSend({type:'reload',weapon:curWeapon});}
+ if(e.code==='KeyR'&&(curWeapon==='gun'||curWeapon==='sniper')&&reloadT<=0&&mag<(curWeapon==='sniper'?5:12)&&reserve>0){reloadT=1.0;sfx.reload();}
  if(e.code==='Space'&&!prone&&crouch<.5&&jumpVel===0&&!tryClimb()){jumpVel=6.2;}
  if(e.code==='Digit1')setWeapon('gun');
- if(!onlineActive&&e.code==='Digit2'){if(hasKnife)setWeapon('knife');else document.getElementById('shot').textContent='NO KNIFE — FIND ONE';}
+ if(e.code==='Digit2'){if(hasKnife)setWeapon('knife');else document.getElementById('shot').textContent='NO KNIFE — FIND ONE';}
  if(e.code==='Digit3'){if(sniperOwned)setWeapon('sniper');else document.getElementById('shot').textContent='NO SNIPER — FIND ONE';}
  if(e.code==='KeyV'){const order=['green','bark','slate'];setCamo(order[(order.indexOf(camo)+1)%order.length]);}});
 addEventListener('keyup',e=>{keys[e.code]=false;});
 addEventListener('mousemove',e=>{if(!started)return;if(!document.pointerLockElement&&!e.buttons)return;const sens=(aim&&curWeapon==='sniper')?(scopeLevel===2?.18:.35):1;yaw-=e.movementX*.0025*sens;pitch=Math.max(-.5,Math.min(.6,pitch-e.movementY*.002*sens));});
-addEventListener('keyup',e=>{if(e.code==='Tab'){scoreboardHeld=false;const b=document.getElementById('onlineBoard');if(b)b.style.display='none';}});
 addEventListener('mousedown',e=>{if(started&&!invOpen){if(!document.pointerLockElement)R.domElement.requestPointerLock();if(e.button===2){if(curWeapon==='sniper'){scopeLevel=(scopeLevel+1)%3;aim=scopeLevel>0;}else aim=!aim;}if(e.button===0&&!binoculars){if(curWeapon==='knife')knife();else fire();}}});
 addEventListener('contextmenu',e=>e.preventDefault());
-addEventListener('keydown',e=>{if(e.code==='Escape'&&(onlineActive||gameMode!=='bots')){started=false;onlineActive=false;onlineFinished=false;Object.keys(keys).forEach(k=>keys[k]=false);for(const id of [...remotePlayers.keys()])removeRemotePlayer(id);scoreboardHeld=false;document.getElementById('onlineBoard').style.display='none';document.getElementById('start').style.display='flex';for(const g of guards)g.g.visible=true;if(netSocket){try{netSocket.close();}catch(err){}netSocket=null;}document.getElementById('cancelQueue').style.display='none';document.exitPointerLock();setMenuStatus('Returned to mode selection.');}});
 addEventListener('resize',()=>{cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();R.setSize(innerWidth,innerHeight);});
-function startBotsMode(){if(netSocket){try{netSocket.close();}catch(e){}netSocket=null;}for(const id of [...remotePlayers.keys()])removeRemotePlayer(id);gameMode='bots';onlineActive=false;onlineFinished=false;document.getElementById('onlineBoard').style.display='none';reset();for(const g of guards)g.g.visible=true;for(const arr of [knifePickups,healthPickups,sniperPickups,ammoPickups])for(const k of arr)if(k.g)k.g.visible=true;started=true;initAudio();document.getElementById('start').style.display='none';R.domElement.requestPointerLock();}
-document.getElementById('modeBots').addEventListener('click',startBotsMode);
-document.getElementById('modeFfa').addEventListener('click',()=>connectOnline('ffa'));
-document.getElementById('modeDuel').addEventListener('click',()=>connectOnline('duel'));
-document.getElementById('cancelQueue').addEventListener('click',cancelOnlineQueue);
-try{const savedName=localStorage.getItem('stealthPlayerName');if(savedName)document.getElementById('playerName').value=savedName;}catch(e){}
-
+document.getElementById('start').addEventListener('click',()=>{started=true;initAudio();document.getElementById('start').style.display='none';R.domElement.requestPointerLock();});
 
 reset();setCamo('green');camPos.copy(pl.position).add(new THREE.Vector3(0,2,3));camLook.copy(pl.position);
 let last=performance.now();
